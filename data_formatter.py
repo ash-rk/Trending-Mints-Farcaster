@@ -1,28 +1,50 @@
+import pandas as pd
 import json
 
-# Function to load and parse JSON data from a file
-def parse_trending_mints(json_file):
+# Load JSON data from file
+def load_json_data(json_file):
     with open(json_file, 'r') as file:
         data = json.load(file)
-        trending_mints = data['data']['TrendingMints']['TrendingMint']
+    return data
 
-        for mint in trending_mints:
-            address = mint['address']
-            token_type = mint['token']['type']
-            token_name = mint['token']['name']
-            symbol = mint['token']['symbol']
-            criteria_count = mint['criteriaCount']
-            time_from = mint['timeFrom']
-            time_to = mint['timeTo']
-            
-            # Print the parsed information
-            print(f"Address: {address}")
-            print(f"Token Type: {token_type}")
-            print(f"Token Name: {token_name}")
-            print(f"Symbol: {symbol}")
-            print(f"Criteria Count: {criteria_count}")
-            print(f"Timeframe: {time_from} to {time_to}")
-            print("-------------------------------")
+# Convert JSON data to pandas DataFrame
+def json_to_dataframe(json_data):
+    trending_mints = json_data['data']['TrendingMints']['TrendingMint']
+    df = pd.json_normalize(trending_mints)
+    return df
 
-# Assuming the JSON file is named 'data-3.json'
-parse_trending_mints('data.json')
+# Rename and rearrange columns in the DataFrame
+def customize_dataframe(df):
+    # Rename columns
+    df.rename(columns={
+        'address': 'Token Address',
+        'token.name': 'NFT',
+        'token.symbol': 'Symbol',
+        'token.type': 'Token Type',
+        'criteriaCount': 'Unique Mints',
+        'timeFrom': 'Start Time',
+        'timeTo': 'End Time'
+    }, inplace=True)
+    
+    # Rearrange columns
+    column_order = ['Token Address', 'NFT', 'Unique Mints', 'Symbol', 'Token Type', 'Start Time', 'End Time']
+    df = df[column_order]
+    return df
+
+# Save DataFrame to CSV
+def save_dataframe_to_csv(df, csv_file_name):
+    df.to_csv(csv_file_name, index=False)
+
+# Main process
+json_file = 'data.json'  # Replace with the path to your JSON file
+json_data = load_json_data(json_file)
+df = json_to_dataframe(json_data)
+
+# Customize DataFrame (rename and rearrange columns)
+df_customized = customize_dataframe(df)
+
+# Specify your desired CSV file name
+csv_file_name = 'trending_mints.csv'
+save_dataframe_to_csv(df_customized, csv_file_name)
+
+print(f"Data has been saved to {csv_file_name}.")
