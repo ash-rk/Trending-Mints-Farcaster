@@ -38,7 +38,7 @@ variables = {
 
 async def main():
     execute_query_client = api_client.create_execute_query_object(query=query, variables=variables)
-    query_response = await execute_query_client.execute_paginated_query()  # Adjusted to match the method used in your snippet
+    query_response = await execute_query_client.execute_paginated_query()
     print(query_response.data)
 
 asyncio.run(main())
