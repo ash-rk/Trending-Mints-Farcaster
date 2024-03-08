@@ -9,7 +9,9 @@ def load_json_data(json_file):
 
 # Convert JSON data to pandas DataFrame
 def json_to_dataframe(json_data):
-    trending_mints = json_data['data']['TrendingMints']['TrendingMint']
+    # trending_mints = json_data['data']['TrendingMints']['TrendingMint']
+    # Use above when downloading data.json directly from Airstack & comment out below
+    trending_mints = json_data['TrendingMints']['TrendingMint']
     df = pd.json_normalize(trending_mints)
     return df
 
